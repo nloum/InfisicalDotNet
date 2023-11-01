@@ -24,7 +24,7 @@ using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
     "continuous",
     GitHubActionsImage.UbuntuLatest,
     On = new[] { GitHubActionsTrigger.Push },
-    InvokedTargets = new[] { nameof(Push) })]
+    InvokedTargets = new[] { nameof(Test), nameof(Push) })]
 class Build : NukeBuild
 {
     /// Support plugins are available for:
@@ -94,29 +94,17 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .SetNoBuild(InvokedTargets.Contains(Compile))
                 .ResetVerbosity()
+                .SetProcessArgumentConfigurator(args => args.Add("--collect:\"XPlat Code Coverage\""))
                 .SetResultsDirectory(TestResultDirectory)
-                //.When(InvokedTargets.Contains(Coverage) || IsServerBuild, _ => _
-                    .EnableCollectCoverage()
-                    .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
-                    .SetExcludeByFile("*.Generated.cs")
-                    .When(IsServerBuild, _ => _
-                        .EnableUseSourceLink())
-                //)
+                .When(IsServerBuild, _ => _
+                    .EnableUseSourceLink())
                 .CombineWith(TestProjects, (_, v) => _
                     .SetProjectFile(v)
                     .SetLoggers($"trx;LogFileName={v.Name}.trx")
-                    .When(InvokedTargets.Contains(Coverage) || IsServerBuild, _ => _
-                        .SetCoverletOutput(TestResultDirectory / $"{v.Name}.xml"))));
-
-            // ArtifactsDirectory.GlobFiles("*.trx").ForEach(x =>
-            //     AzurePipelines?.PublishTestResults(
-            //         type: AzurePipelinesTestResultsType.VSTest,
-            //         title: $"{Path.GetFileNameWithoutExtension(x)} ({AzurePipelines.StageDisplayName})",
-            //         files: new string[] { x }));
+                    .SetCoverletOutput(TestResultDirectory / $"{v.Name}.xml")));
         });
 
     string CoverageReportDirectory => ArtifactsDirectory / "coverage-report";
-    // string CoverageReportArchive => ArtifactsDirectory / "coverage-report.zip";
 
     Target Coverage => _ => _
         .DependsOn(Test)
@@ -128,18 +116,15 @@ class Build : NukeBuild
 	        var package = NuGetPackageResolver.GetGlobalInstalledPackage("dotnet-reportgenerator-globaltool", "5.1.26", null);
 	        //var settings = new GitVersionSettings().SetToolPath( package.Directory / "tools/netcoreapp3.1/any/gitversion.dll");
 
+            // TestResultDirectory.GlobFiles("**/*.xml").ForEach(x =>
+            //     x.Move(TestResultDirectory / $"{x.Parent.Name}-coverage.cobertura.xml"));
+            
 	        ReportGenerator(_ => _
                 .SetProcessToolPath(package.Directory / "tools/net7.0/any/reportgenerator.dll")
-                .SetReports(TestResultDirectory / "*.xml")
+                .SetReports(TestResultDirectory / "**/*.xml")
                 .SetReportTypes(ReportTypes.HtmlInline)
                 .SetTargetDirectory(CoverageReportDirectory)
                 .SetFramework("net7.0"));
-
-            // TestResultDirectory.GlobFiles("*.xml").ForEach(x =>
-            //     AzurePipelines?.PublishCodeCoverage(
-            //         AzurePipelinesCodeCoverageToolType.Cobertura,
-            //         x,
-            //         CoverageReportDirectory));
             //
             // CompressZip(
             //     directory: CoverageReportDirectory,
@@ -179,5 +164,4 @@ class Build : NukeBuild
 				)
             );
         });
-    
 }
