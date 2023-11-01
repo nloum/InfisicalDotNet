@@ -35,6 +35,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
       - name: 'Run: Test, Push'
         run: ./build.cmd Test Push
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       - name: 'Publish: test-results'
         uses: actions/upload-artifact@v3
         with:
