@@ -4,12 +4,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfisicalDotNet", "Infisica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfisicalDotNet.Tests", "InfisicalDotNet.Tests\InfisicalDotNet.Tests.csproj", "{F0060438-8BA1-47F4-9532-AA9BEC0BFDC8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{8A01F6A4-AA1A-42F0-8794-1BC59691C2E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A01F6A4-AA1A-42F0-8794-1BC59691C2E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A01F6A4-AA1A-42F0-8794-1BC59691C2E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0D1F5B3-C8F9-4522-950E-BDBF2D53D162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E0D1F5B3-C8F9-4522-950E-BDBF2D53D162}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0D1F5B3-C8F9-4522-950E-BDBF2D53D162}.Release|Any CPU.ActiveCfg = Release|Any CPU
