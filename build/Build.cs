@@ -152,6 +152,7 @@ class Build : NukeBuild
     Target Push => _ => _
         .DependsOn(Pack)
         .Consumes(Pack)
+        .Requires(() => NugetApiKey)
         .Requires(() => Configuration == Configuration.Release)
         .Executes(() =>
         {
