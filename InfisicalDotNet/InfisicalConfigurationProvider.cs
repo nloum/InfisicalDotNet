@@ -55,7 +55,7 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
             var tokenMatch = _tokenRegex.Match(_infisicalServiceToken);
             var serviceTokenKey = tokenMatch.Groups[2].Value;
             
-            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath={_secretPath}&include_imports={_includeImports}";
+            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath={_secretPath}&include_imports={_includeImports.ToString().ToLower()}";
             var response = await _httpClient.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
