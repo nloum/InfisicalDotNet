@@ -2,7 +2,7 @@
 
 This is a .NET library that makes it easy to use the [.NET configuration system](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-7.0) with [Infisical](https://infisical.com/).
 
-![Nuget](https://img.shields.io/nuget/dt/InfisicalDotNet) | ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nloum/InfisicalDotNet/continuous)
+[![Nuget](https://img.shields.io/nuget/dt/InfisicalDotNet)](https://www.nuget.org/packages/InfisicalDotNet)
 
 ## How do I use this?
 
