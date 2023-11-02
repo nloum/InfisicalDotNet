@@ -9,7 +9,7 @@ public class InfisicalConfigurationSource : IConfigurationSource
     private readonly string _secretPath;
     private readonly bool _includeImports;
 
-    public InfisicalConfigurationSource(string apiUrl, string? infisicalServiceToken, string secretPath = "/", bool includeImports = true)
+    public InfisicalConfigurationSource(string apiUrl, string? infisicalServiceToken = null, string secretPath = "/", bool includeImports = true)
     {
         _apiUrl = apiUrl;
         _infisicalServiceToken = infisicalServiceToken;

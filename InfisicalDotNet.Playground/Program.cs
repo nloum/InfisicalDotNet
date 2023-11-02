@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
-    .AddInfisical(Environment.GetEnvironmentVariable("INFISICAL_TOKEN"));
+    .AddInfisical(Environment.GetEnvironmentVariable("INFISICAL_SERVICE_TOKEN"));
 
 // Add services to the container.
 builder.Services.AddRazorPages();

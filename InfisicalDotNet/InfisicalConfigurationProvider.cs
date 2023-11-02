@@ -20,10 +20,10 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     private readonly bool _includeImports;
     private static readonly Regex _tokenRegex = new(@"(st\.[a-f0-9]+\.[a-f0-9]+)\.([a-f0-9]+)");
 
-    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken, string secretPath = "/", bool includeImports = true)
+    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken = null, string secretPath = "/", bool includeImports = true)
     {
         _apiUrl = apiUrl;
-        _infisicalServiceToken = infisicalServiceToken;
+        _infisicalServiceToken = infisicalServiceToken ?? Environment.GetEnvironmentVariable("INFISICAL_SERVICE_TOKEN");
         _secretPath = secretPath;
         _includeImports = includeImports;
         _httpClient = new HttpClient();
