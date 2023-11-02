@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
+using System.Text.Json;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
@@ -14,6 +15,7 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.ReportGenerator;
 using Nuke.Common.Utilities.Collections;
+using Serilog;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
@@ -53,6 +55,16 @@ class Build : NukeBuild
     readonly string NugetSource = "https://api.nuget.org/v3/index.json";
     [Parameter("API Key for the NuGet server.")]
     readonly string NugetApiKey;
+
+    Target Version => _ => _
+        .Executes(() =>
+        {
+            var output = JsonSerializer.Serialize(GitVersion, new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+            });
+            Log.Information("Version information: ${Version}", output);
+        });
     
     Target Clean => _ => _
         .Before(Restore)
@@ -143,7 +155,7 @@ class Build : NukeBuild
 				.SetProject(Solution)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
-                .SetVersion(GitVersion.NuGetVersionV2)
+                .SetVersion(GitVersion.SemVer)
 				.SetIncludeSymbols(true)
 				.SetSymbolPackageFormat(DotNetSymbolPackageFormat.snupkg)
             );
