@@ -18,14 +18,16 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     private readonly string? _infisicalServiceToken;
     private readonly string _secretPath;
     private readonly bool _includeImports;
+    private readonly string _prefix;
     private static readonly Regex _tokenRegex = new(@"(st\.[a-f0-9]+\.[a-f0-9]+)\.([a-f0-9]+)");
 
-    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken = null, string secretPath = "/", bool includeImports = true)
+    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken = null, string secretPath = "/", bool includeImports = true, string prefix = "")
     {
         _apiUrl = apiUrl;
         _infisicalServiceToken = infisicalServiceToken ?? Environment.GetEnvironmentVariable("INFISICAL_SERVICE_TOKEN");
         _secretPath = secretPath;
         _includeImports = includeImports;
+        _prefix = prefix;
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _infisicalServiceToken);
         _httpClient.BaseAddress = new Uri(_apiUrl);
@@ -79,7 +81,7 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
 
             foreach (var secret in _secretsCache)
             {
-                var key = secret.Key.Replace("__", ":");
+                var key = _prefix + secret.Key.Replace("__", ":");
                 Data.Add(key, secret.Value);
             }
         }
