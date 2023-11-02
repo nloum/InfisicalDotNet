@@ -22,11 +22,6 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
-[GitHubActions(
-    "continuous",
-    GitHubActionsImage.UbuntuLatest,
-    On = new[] { GitHubActionsTrigger.Push },
-    InvokedTargets = new[] { nameof(Test), nameof(Push) })]
 class Build : NukeBuild
 {
     /// Support plugins are available for:
