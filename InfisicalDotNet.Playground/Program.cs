@@ -1,8 +1,11 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using InfisicalDotNet;
 using InfisicalDotNet.Playground.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddInfisical(Environment.GetEnvironmentVariable("INFISICAL_TOKEN"));
 
 // Add services to the container.
 builder.Services.AddRazorPages();

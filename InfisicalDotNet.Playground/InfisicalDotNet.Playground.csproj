@@ -13,4 +13,8 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\InfisicalDotNet\InfisicalDotNet.csproj" />
+    </ItemGroup>
+
 </Project>
