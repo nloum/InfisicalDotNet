@@ -120,7 +120,7 @@ class Build : NukeBuild
             //     x.Move(TestResultDirectory / $"{x.Parent.Name}-coverage.cobertura.xml"));
             
 	        ReportGenerator(_ => _
-                .SetProcessToolPath(package.Directory / "tools/net7.0/any/reportgenerator.dll")
+                .SetProcessToolPath(package.Directory / "tools/net7.0/any/ReportGenerator.dll")
                 .SetReports(TestResultDirectory / "**/*.xml")
                 .SetReportTypes(ReportTypes.HtmlInline)
                 .SetTargetDirectory(CoverageReportDirectory)
