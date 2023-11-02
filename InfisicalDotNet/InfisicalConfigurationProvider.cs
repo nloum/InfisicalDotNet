@@ -16,12 +16,16 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     private readonly HttpClient _httpClient;
     private Dictionary<string, string> _secretsCache = new();
     private readonly string? _infisicalServiceToken;
+    private readonly string _secretPath;
+    private readonly bool _includeImports;
     private static readonly Regex _tokenRegex = new(@"(st\.[a-f0-9]+\.[a-f0-9]+)\.([a-f0-9]+)");
 
-    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken)
+    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken, string secretPath = "/", bool includeImports = true)
     {
         _apiUrl = apiUrl;
         _infisicalServiceToken = infisicalServiceToken;
+        _secretPath = secretPath;
+        _includeImports = includeImports;
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _infisicalServiceToken);
         _httpClient.BaseAddress = new Uri(_apiUrl);
@@ -51,7 +55,7 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
             var tokenMatch = _tokenRegex.Match(_infisicalServiceToken);
             var serviceTokenKey = tokenMatch.Groups[2].Value;
             
-            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath=/&include_imports=true";
+            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath={_secretPath}&include_imports={_includeImports}";
             var response = await _httpClient.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();

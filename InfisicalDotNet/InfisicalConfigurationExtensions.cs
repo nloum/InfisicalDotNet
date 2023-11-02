@@ -6,9 +6,11 @@ public static class InfisicalConfigurationExtensions
 {
     public static IConfigurationBuilder AddInfisical(
         this IConfigurationBuilder builder, 
-        string? infisicalToken,
-        string apiUrl = "https://app.infisical.com")
+        string? infisicalServiceToken,
+        string apiUrl = "https://app.infisical.com",
+        string secretPath = "/",
+        bool includeImports = true)
     {
-        return builder.Add(new InfisicalConfigurationSource(apiUrl, infisicalToken));
+        return builder.Add(new InfisicalConfigurationSource(apiUrl, infisicalServiceToken, secretPath, includeImports));
     }
 }
