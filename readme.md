@@ -26,7 +26,7 @@ builder.Configuration
 // Add services to the container.
 ```
 
-Or you can avoid specifying the service token, which grabs it from the `INFISICAL_SERVICE_TOKEN` environment variable behind the scenes:
+Or you can avoid specifying the service token, in which case it uses the `INFISICAL_SERVICE_TOKEN` environment variable behind the scenes:
 
 ```csharp
 using InfisicalDotNet;
