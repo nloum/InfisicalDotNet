@@ -54,6 +54,6 @@ Secret keys should be formatted like environment variables. For example, conside
 
 The equivalent of this JSON would be a secret in Infisical with the key `CONNNECTIONSTRINGS__DEFAULTCONNECTION`. Note the double underscore. More information on this is available in [ASP.NET Core's environment variable naming documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-7.0#naming-of-environment-variables).
 
-## Possible future work
+## Why can't I specify the secret path, workspace or environment?
 
-Currently this library only supports authentication using service tokens. Infisical service tokens are only allowed to access a specific workspace and environment. That is how this library knows which workspace and environment to use. It may be helpful eventually to support specifying the workspace and environment in addition to the service token and deriving the environment from the ASP.NET Core environment, in order to catch problems where the wrong Infisical service is specified for the ASP.NET Core environment. 
+When you create a service token it is scoped to a specific workspace, environment and secret path, so this configuration provider uses those.

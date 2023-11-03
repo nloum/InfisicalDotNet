@@ -8,10 +8,9 @@ public static class InfisicalConfigurationExtensions
         this IConfigurationBuilder builder, 
         string? infisicalServiceToken = null,
         string apiUrl = "https://app.infisical.com",
-        string secretPath = "/",
         bool includeImports = true,
         string prefix="")
     {
-        return builder.Add(new InfisicalConfigurationSource(apiUrl, infisicalServiceToken, secretPath, includeImports, prefix));
+        return builder.Add(new InfisicalConfigurationSource(apiUrl, infisicalServiceToken, includeImports, prefix));
     }
 }

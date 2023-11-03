@@ -16,16 +16,14 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     private readonly HttpClient _httpClient;
     private Dictionary<string, string> _secretsCache = new();
     private readonly string? _infisicalServiceToken;
-    private readonly string _secretPath;
     private readonly bool _includeImports;
     private readonly string _prefix;
     private static readonly Regex _tokenRegex = new(@"(st\.[a-f0-9]+\.[a-f0-9]+)\.([a-f0-9]+)");
 
-    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken = null, string secretPath = "/", bool includeImports = true, string prefix = "")
+    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken = null, bool includeImports = true, string prefix = "")
     {
         _apiUrl = apiUrl;
         _infisicalServiceToken = infisicalServiceToken ?? Environment.GetEnvironmentVariable("INFISICAL_SERVICE_TOKEN");
-        _secretPath = secretPath;
         _includeImports = includeImports;
         _prefix = prefix;
         _httpClient = new HttpClient();
@@ -52,12 +50,13 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
                 throw new InvalidOperationException("Failed to access service token details");
             }
             var environment = serviceTokenObj.Scopes[0].environment;
+            var secretPath = serviceTokenObj.Scopes[0].secretPath;
             var workspace = serviceTokenObj.Workspace;
 
             var tokenMatch = _tokenRegex.Match(_infisicalServiceToken);
             var serviceTokenKey = tokenMatch.Groups[2].Value;
             
-            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath={_secretPath}&include_imports={_includeImports.ToString().ToLower()}";
+            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath={secretPath}&include_imports={_includeImports.ToString().ToLower()}";
             var response = await _httpClient.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
