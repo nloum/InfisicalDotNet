@@ -75,18 +75,26 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
             var workspaceKey = DecryptSymmetric128BitHexKeyUtf8(serviceTokenKey, serviceTokenObj.EncryptedKey,
                 serviceTokenObj.Tag, serviceTokenObj.Iv);
             
-            _secretsCache = secrets.Secrets.ToDictionary(
-                secret => DecryptSymmetric128BitHexKeyUtf8(
-                    key: workspaceKey,
-                    ciphertext: secret.SecretKeyCiphertext,
-                    tag: secret.SecretKeyTag,
-                    iv: secret.SecretKeyIV), 
-                secret => DecryptSymmetric128BitHexKeyUtf8(
-                    key: workspaceKey,
-                    ciphertext: secret.SecretValueCiphertext,
-                    tag: secret.SecretValueTag,
-                    iv: secret.SecretValueIV)
-                );
+            var allSecrets = secrets.Secrets.Select(
+                secret => new KeyValuePair<string, string>(
+                    DecryptSymmetric128BitHexKeyUtf8(
+                        key: workspaceKey,
+                        ciphertext: secret.SecretKeyCiphertext,
+                        tag: secret.SecretKeyTag,
+                        iv: secret.SecretKeyIV),
+                    DecryptSymmetric128BitHexKeyUtf8(
+                        key: workspaceKey,
+                        ciphertext: secret.SecretValueCiphertext,
+                        tag: secret.SecretValueTag,
+                        iv: secret.SecretValueIV)
+                )).ToList();
+            allSecrets.Reverse();
+
+            _secretsCache.Clear();
+            foreach (var secret in allSecrets)
+            {
+                _secretsCache[secret.Key] = secret.Value;
+            }
 
             foreach (var secret in _secretsCache)
             {
