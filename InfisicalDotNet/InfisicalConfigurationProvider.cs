@@ -108,6 +108,8 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
             {
                 Data.Add(secret.Key, secret.Value);
             }
+
+            throw;
         }
     }
     
