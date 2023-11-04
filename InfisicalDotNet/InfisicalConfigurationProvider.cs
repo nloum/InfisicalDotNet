@@ -33,7 +33,17 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
 
     public override void Load()
     {
-        LoadAsync().GetAwaiter().GetResult();
+        var task = LoadAsync();
+        task.GetAwaiter().GetResult();
+        if (task.Exception is not null)
+        {
+            if (task.Exception.InnerException is not null)
+            {
+                throw task.Exception.InnerException;
+            }
+
+            throw task.Exception;
+        }
     }
 
     private async Task LoadAsync()
