@@ -37,6 +37,7 @@ jobs:
         run: ./build.cmd Version Test Push
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          INFISICAL_SERVICE_TOKEN: ${{ secrets.INFISICAL_SERVICE_TOKEN }}
       - name: 'Publish: test-results'
         uses: actions/upload-artifact@v3
         with:
