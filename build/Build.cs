@@ -1,12 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Versioning;
 using System.Text.Json;
 using Nuke.Common;
-using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
@@ -16,9 +11,7 @@ using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.ReportGenerator;
 using Nuke.Common.Utilities.Collections;
 using Serilog;
-using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
@@ -39,7 +32,7 @@ class Build : NukeBuild
     
     [Solution]
     readonly Solution Solution;
-    [GitVersion(Framework = "net7.0")]
+    [GitVersion(Framework = "net8.0")]
     GitVersion GitVersion;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
@@ -141,7 +134,6 @@ class Build : NukeBuild
     
     Target Pack => _ => _
         .DependsOn(Compile)
-		//.Requires(() => Configuration == Configuration.Release)
         .Executes(() =>
         {
             DotNetPack(s => s
@@ -150,7 +142,7 @@ class Build : NukeBuild
 				.SetProject(Solution)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
-                .SetVersion(GitVersion.NuGetVersionV2)
+                .SetVersion(GitVersion.NuGetVersion)
 				.SetIncludeSymbols(true)
 				.SetSymbolPackageFormat(DotNetSymbolPackageFormat.snupkg)
             );
