@@ -16,12 +16,16 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     private readonly HttpClient _httpClient;
     private Dictionary<string, string> _secretsCache = new();
     private readonly string? _infisicalServiceToken;
+    private readonly bool _includeImports;
+    private readonly string _prefix;
     private static readonly Regex _tokenRegex = new(@"(st\.[a-f0-9]+\.[a-f0-9]+)\.([a-f0-9]+)");
 
-    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken)
+    public InfisicalConfigurationProvider(string apiUrl, string? infisicalServiceToken = null, bool includeImports = true, string prefix = "")
     {
         _apiUrl = apiUrl;
-        _infisicalServiceToken = infisicalServiceToken;
+        _infisicalServiceToken = infisicalServiceToken ?? Environment.GetEnvironmentVariable("INFISICAL_SERVICE_TOKEN");
+        _includeImports = includeImports;
+        _prefix = prefix;
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _infisicalServiceToken);
         _httpClient.BaseAddress = new Uri(_apiUrl);
@@ -29,7 +33,17 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
 
     public override void Load()
     {
-        LoadAsync().GetAwaiter().GetResult();
+        var task = LoadAsync();
+        task.GetAwaiter().GetResult();
+        if (task.Exception is not null)
+        {
+            if (task.Exception.InnerException is not null)
+            {
+                throw task.Exception.InnerException;
+            }
+
+            throw task.Exception;
+        }
     }
 
     private async Task LoadAsync()
@@ -46,12 +60,13 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
                 throw new InvalidOperationException("Failed to access service token details");
             }
             var environment = serviceTokenObj.Scopes[0].environment;
+            var secretPath = serviceTokenObj.Scopes[0].secretPath;
             var workspace = serviceTokenObj.Workspace;
 
             var tokenMatch = _tokenRegex.Match(_infisicalServiceToken);
             var serviceTokenKey = tokenMatch.Groups[2].Value;
             
-            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath=/&include_imports=true";
+            var url = $"{_apiUrl}/api/v3/secrets/?environment={environment}&workspaceId={workspace}&secretPath={secretPath}&include_imports={_includeImports.ToString().ToLower()}";
             var response = await _httpClient.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
@@ -60,22 +75,30 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
             var workspaceKey = DecryptSymmetric128BitHexKeyUtf8(serviceTokenKey, serviceTokenObj.EncryptedKey,
                 serviceTokenObj.Tag, serviceTokenObj.Iv);
             
-            _secretsCache = secrets.Secrets.ToDictionary(
-                secret => DecryptSymmetric128BitHexKeyUtf8(
-                    key: workspaceKey,
-                    ciphertext: secret.SecretKeyCiphertext,
-                    tag: secret.SecretKeyTag,
-                    iv: secret.SecretKeyIV), 
-                secret => DecryptSymmetric128BitHexKeyUtf8(
-                    key: workspaceKey,
-                    ciphertext: secret.SecretValueCiphertext,
-                    tag: secret.SecretValueTag,
-                    iv: secret.SecretValueIV)
-                );
+            var allSecrets = secrets.Secrets.Select(
+                secret => new KeyValuePair<string, string>(
+                    DecryptSymmetric128BitHexKeyUtf8(
+                        key: workspaceKey,
+                        ciphertext: secret.SecretKeyCiphertext,
+                        tag: secret.SecretKeyTag,
+                        iv: secret.SecretKeyIV),
+                    DecryptSymmetric128BitHexKeyUtf8(
+                        key: workspaceKey,
+                        ciphertext: secret.SecretValueCiphertext,
+                        tag: secret.SecretValueTag,
+                        iv: secret.SecretValueIV)
+                )).ToList();
+            allSecrets.Reverse();
+
+            _secretsCache.Clear();
+            foreach (var secret in allSecrets)
+            {
+                _secretsCache[secret.Key] = secret.Value;
+            }
 
             foreach (var secret in _secretsCache)
             {
-                var key = secret.Key.Replace("__", ":");
+                var key = _prefix + secret.Key.Replace("__", ":");
                 Data.Add(key, secret.Value);
             }
         }
@@ -85,6 +108,8 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
             {
                 Data.Add(secret.Key, secret.Value);
             }
+
+            throw;
         }
     }
     
