@@ -141,7 +141,7 @@ class Build : NukeBuild
     
     Target Pack => _ => _
         .DependsOn(Compile)
-		.Requires(() => Configuration == Configuration.Release)
+		//.Requires(() => Configuration == Configuration.Release)
         .Executes(() =>
         {
             DotNetPack(s => s
