@@ -150,7 +150,7 @@ class Build : NukeBuild
 				.SetProject(Solution)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
-                .SetVersion(GitVersion.SemVer)
+                .SetVersion(GitVersion.NuGetVersionV2)
 				.SetIncludeSymbols(true)
 				.SetSymbolPackageFormat(DotNetSymbolPackageFormat.snupkg)
             );
